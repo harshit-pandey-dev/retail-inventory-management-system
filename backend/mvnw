@@ -1,0 +1,24 @@
+#!/bin/sh
+# Portable Maven wrapper script for Retail Inventory Management System
+set -e
+
+DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Check if global mvn exists
+if command -v mvn >/dev/null 2>&1; then
+    exec mvn "$@"
+fi
+
+# Fallback to local user wrapper maven distribution if available
+CACHED_MVN=$(find /Users/harshitpandey/.m2/wrapper/dists -name mvn 2>/dev/null | head -n 1)
+if [ -n "$CACHED_MVN" ] && [ -x "$CACHED_MVN" ]; then
+    exec "$CACHED_MVN" "$@"
+fi
+
+# Try Homebrew maven
+if [ -x "/opt/homebrew/bin/mvn" ]; then
+    exec "/opt/homebrew/bin/mvn" "$@"
+fi
+
+echo "Maven not found. Please install maven or ensure 'mvn' is in PATH." >&2
+exit 1
